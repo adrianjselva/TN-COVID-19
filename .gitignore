@@ -1,0 +1,9 @@
+accessToken
+.DS_Store
+.RData
+.Rhistory
+counties.json
+maps/
+plots/
+counties/
+datasets/
