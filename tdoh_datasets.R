@@ -347,9 +347,12 @@ daily_testing_data_plot <- function(ds) {
     showgrid = FALSE
   )
   
+  fdate <- format(mod_date_range, '%Y-%m-%d')
+  
   percent_positve <- (mod_pos_range / mod_test_range) * 100
   percent_positve <- round(percent_positve, 1)
   percent_positve[which(!is.finite(percent_positve))] <- 0.0
+  percent_positve[which(percent_positve < 0.0)] <- 0.0
   
   result <- plot_ly(data = ds, showlegend = TRUE, hoverinfo = 'skip') 
   result <- result %>% add_trace(x = mod_date_range, 
@@ -381,7 +384,14 @@ daily_testing_data_plot <- function(ds) {
                               margin = list(r = 45))
   result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
-  return(result)
+  export <- list(xval = fdate, 
+                 totalTestVal = mod_test_range,
+                 positiveVals = mod_pos_range,
+                 percentPositive = percent_positve,
+                 gtitle = g_title,
+                 type = "testing")
+  
+  return(export)
 }
 
 current_active_cases_plot <- function(ds) {
@@ -614,473 +624,374 @@ total_cases_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), total_cases = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), total_cases = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     total_cases <- cty$TOTAL_CASES[length(cty$TOTAL_CASES)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, total_cases)
+      df[1,] <- c(names, total_cases)
     } else {
-      df[nrow(df) + 1,] <- c(fips, total_cases)
+      df[nrow(df) + 1,] <- c(names, total_cases)
     }
     
   }
   
   df$total_cases <- as.numeric(df$total_cases)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$total_cases,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$total_cases, 
+                 type = "map", 
+                 mtitle = "Total COVID-19 Cases",
+                 hovtext = "Total cases:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(164, 225, 252)',
+                 col3 = 'rgb(105, 201, 245)',
+                 col4 = 'rgb(3, 175, 255)',
+                 col5 = 'rgb(0, 56, 120)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 total_deaths_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), total_deaths = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), total_deaths = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     total_deaths <- cty$TOTAL_DEATHS[length(cty$TOTAL_DEATHS)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, total_deaths)
+      df[1,] <- c(names, total_deaths)
     } else {
-      df[nrow(df) + 1,] <- c(fips, total_deaths)
+      df[nrow(df) + 1,] <- c(names, total_deaths)
     }
     
   }
   
   df$total_deaths <- as.numeric(df$total_deaths)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$total_deaths,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$total_deaths, 
+                 type = "map", 
+                 mtitle = "Total COVID-19 Deaths",
+                 hovtext = "Total deaths:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(255, 179, 179)',
+                 col3 = 'rgb(240, 101, 101)',
+                 col4 = 'rgb(199, 28, 28)',
+                 col5 = 'rgb(148, 0, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 daily_cases_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), new_cases = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), new_cases = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    name <- cty$COUNTY[1]
     new_cases <- cty$NEW_CASES[length(cty$NEW_CASES)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, new_cases)
+      df[1,] <- c(name, new_cases)
     } else {
-      df[nrow(df) + 1,] <- c(fips, new_cases)
+      df[nrow(df) + 1,] <- c(name, new_cases)
     }
-
+    
   }
   
   df$new_cases <- as.numeric(df$new_cases)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$new_cases,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$new_cases, 
+                 type = "map", 
+                 mtitle = paste("Daily COVID-19 Cases:", mcurr_date),
+                 hovtext = "New cases:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(164, 225, 252)',
+                 col3 = 'rgb(105, 201, 245)',
+                 col4 = 'rgb(3, 175, 255)',
+                 col5 = 'rgb(0, 56, 120)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 daily_deaths_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), new_deaths = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), new_deaths = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     new_deaths <- cty$NEW_DEATHS[length(cty$NEW_DEATHS)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, new_deaths)
+      df[1,] <- c(names, new_deaths)
     } else {
-      df[nrow(df) + 1,] <- c(fips, new_deaths)
+      df[nrow(df) + 1,] <- c(names, new_deaths)
     }
     
   }
   
   df$new_deaths <- as.numeric(df$new_deaths)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$new_deaths,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$new_deaths, 
+                 type = "map", 
+                 mtitle = paste("Daily COVID-19 Deaths:", mcurr_date),
+                 hovtext = "New deaths:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(252, 165, 164)',
+                 col3 = 'rgb(240, 101, 101)',
+                 col4 = 'rgb(199, 28, 28)',
+                 col5 = 'rgb(148, 0, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 total_tests_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), total_tests = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), total_tests = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     total_tests <- cty$TOTAL_TESTS[length(cty$TOTAL_TESTS)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, total_tests)
+      df[1,] <- c(names, total_tests)
     } else {
-      df[nrow(df) + 1,] <- c(fips, total_tests)
+      df[nrow(df) + 1,] <- c(names, total_tests)
     }
     
   }
   
   df$total_tests <- as.numeric(df$total_tests)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$total_tests,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$total_tests, 
+                 type = "map", 
+                 mtitle = "Total COVID-19 Tests",
+                 hovtext = "Total tests performed:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(232, 171, 255)',
+                 col3 = 'rgb(219, 122, 255)',
+                 col4 = 'rgb(160, 50, 201)',
+                 col5 = 'rgb(114, 2, 156)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 current_active_cases_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), current_active_cases = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), current_active_cases = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     current_active_cases <- cty$TOTAL_ACTIVE[length(cty$TOTAL_ACTIVE)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, current_active_cases)
+      df[1,] <- c(names, current_active_cases)
     } else {
-      df[nrow(df) + 1,] <- c(fips, current_active_cases)
+      df[nrow(df) + 1,] <- c(names, current_active_cases)
     }
     
   }
   
   df$current_active_cases <- as.numeric(df$current_active_cases)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$current_active_cases,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
-  
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  export <- list(counties = df$names, 
+                 z = df$current_active_cases, 
+                 type = "map", 
+                 mtitle = "Active COVID-19 Cases",
+                 hovtext = "Active cases:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(158, 255, 182)',
+                 col3 = 'rgb(105, 255, 142)',
+                 col4 = 'rgb(50, 201, 88)',
+                 col5 = 'rgb(0, 138, 34)')
+
+  return(export)
 }
 
 daily_active_cases_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), daily_active_cases = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), daily_active_cases = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     daily_active_cases <- cty$NEW_ACTIVE[length(cty$NEW_ACTIVE)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, daily_active_cases)
+      df[1,] <- c(names, daily_active_cases)
     } else {
-      df[nrow(df) + 1,] <- c(fips, daily_active_cases)
+      df[nrow(df) + 1,] <- c(names, daily_active_cases)
     }
     
   }
   
   df$daily_active_cases <- as.numeric(df$daily_active_cases)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$daily_active_cases,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$daily_active_cases, 
+                 type = "map", 
+                 mtitle = paste("Daily Change of Active COVID-19 Cases:", mcurr_date),
+                 hovtext = "Net change of active cases:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(158, 255, 182)',
+                 col3 = 'rgb(105, 255, 142)',
+                 col4 = 'rgb(50, 201, 88)',
+                 col5 = 'rgb(0, 138, 34)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 total_recovered_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), total_recovered = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), total_recovered = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     total_recovered <- cty$TOTAL_RECOVERED[length(cty$TOTAL_RECOVERED)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, total_recovered)
+      df[1,] <- c(names, total_recovered)
     } else {
-      df[nrow(df) + 1,] <- c(fips, total_recovered)
+      df[nrow(df) + 1,] <- c(names, total_recovered)
     }
     
   }
   
   df$total_recovered <- as.numeric(df$total_recovered)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$total_recovered,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$total_recovered, 
+                 type = "map", 
+                 mtitle = "Total COVID-19 Recoveries",
+                 hovtext = "Recovered cases:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(250, 255, 156)',
+                 col3 = 'rgb(248, 255, 102)',
+                 col4 = 'rgb(233, 242, 44)',
+                 col5 = 'rgb(165, 173, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 daily_recovered_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), daily_recovered = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), daily_recovered = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     daily_recovered <- cty$NEW_RECOVERED[length(cty$NEW_RECOVERED)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, daily_recovered)
+      df[1,] <- c(names, daily_recovered)
     } else {
-      df[nrow(df) + 1,] <- c(fips, daily_recovered)
+      df[nrow(df) + 1,] <- c(names, daily_recovered)
     }
     
   }
   
   df$daily_recovered <- as.numeric(df$daily_recovered)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$daily_recovered,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$daily_recovered, 
+                 type = "map", 
+                 mtitle = paste("Daily COVID-19 Recoveries:", mcurr_date),
+                 hovtext = "New recoveries:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(250, 255, 156)',
+                 col3 = 'rgb(248, 255, 102)',
+                 col4 = 'rgb(233, 242, 44)',
+                 col5 = 'rgb(165, 173, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 total_hospitalizations_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), total_hospitalizations = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), total_hospitalizations = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     total_hospitalizations <- cty$TOTAL_HOSPITALIZED[length(cty$TOTAL_HOSPITALIZED)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, total_hospitalizations)
+      df[1,] <- c(names, total_hospitalizations)
     } else {
-      df[nrow(df) + 1,] <- c(fips, total_hospitalizations)
+      df[nrow(df) + 1,] <- c(names, total_hospitalizations)
     }
     
   }
   
   df$total_hospitalizations <- as.numeric(df$total_hospitalizations)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$total_hospitalizations,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$total_hospitalizations, 
+                 type = "map", 
+                 mtitle = "Total COVID-19 Hospitalizations",
+                 hovtext = "Total hospitalizations:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(255, 204, 163)',
+                 col3 = 'rgb(255, 175, 110)',
+                 col4 = 'rgb(222, 134, 62)',
+                 col5 = 'rgb(191, 86, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 daily_hospitalizations_map <- function(superlist) {
   
   fig <- plot_ly()
   
-  df <- data.frame(fips = c(NA), new_hospitalizations = c(NA), stringsAsFactors = FALSE)
+  df <- data.frame(names = c(NA), new_hospitalizations = c(NA), stringsAsFactors = FALSE)
   
   for(cty in superlist) {
-    fips <- cty$FIPS[1]
+    names <- cty$COUNTY[1]
     new_hospitalizations <- cty$NEW_HOSPITALIZED[length(cty$NEW_HOSPITALIZED)]
     
     if(is.na(df[1,1])) {
-      df[1,] <- c(fips, new_hospitalizations)
+      df[1,] <- c(names, new_hospitalizations)
     } else {
-      df[nrow(df) + 1,] <- c(fips, new_hospitalizations)
+      df[nrow(df) + 1,] <- c(names, new_hospitalizations)
     }
     
   }
   
   df$new_hospitalizations <- as.numeric(df$new_hospitalizations)
   
-  fig <- fig %>% add_trace(
-    type="choroplethmapbox",
-    geojson=county_geojson,
-    locations=df$fips,
-    z=df$new_hospitalizations,
-    featureidkey="properties.FIPS",
-    colorscale="Viridis",
-    marker=list(line=list(
-      width=0),
-      opacity=0.5
-    )
-  )
+  export <- list(counties = df$names, 
+                 z = df$new_hospitalizations, 
+                 type = "map", 
+                 mtitle = paste("Daily COVID-19 Hospitalizations:", mcurr_date),
+                 hovtext = "New hospitalizations:",
+                 col1 = 'rgb(255, 255, 255)',
+                 col2 = 'rgb(255, 204, 163)',
+                 col3 = 'rgb(255, 175, 110)',
+                 col4 = 'rgb(222, 134, 62)',
+                 col5 = 'rgb(191, 86, 0)')
   
-  fig <- fig %>% layout(
-    mapbox=list(
-      style="carto-positron",
-      zoom=4.75,
-      center=list(lat=35.51, lon=-86))
-  )
-  
-  return(fig)
+  return(export)
 }
 
 
@@ -1133,12 +1044,12 @@ print("Loading files...")
 age_col_types <- c("date", "text", "numeric", "numeric", "numeric", 
                    "numeric", "numeric", "numeric")
 
-county_new_col_types <- c("date", "text", "numeric", "numeric","numeric",
+county_new_col_types <- c("date", "text", "numeric", "numeric","numeric", "numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric", "numeric")
 
-daily_case_info_col_types <- c("date", "numeric", "numeric", "numeric", "numeric",
+daily_case_info_col_types <- c("date", "numeric","numeric", "numeric", "numeric", "numeric", "numeric",
                                "numeric", "numeric", "numeric", "numeric",
                                "numeric", "numeric", "numeric", "numeric",
                                "numeric", "numeric", "numeric", "numeric")
@@ -1152,7 +1063,7 @@ county_new_dataset <- load_file(county_new_temp_path, county_new_col_types)
 daily_case_info_dataset <- load_file(daily_case_info_temp_path, daily_case_info_col_types)
 race_ethnicity_sex_dataset <- load_file(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
 fips <- read.csv(file = 'fips/tn-counties.csv', stringsAsFactors = FALSE, colClasses = fips_col_types)
-county_geojson <- rjson::fromJSON(file = "geojson/tn_counties.json")
+county_geojson <- rjson::fromJSON(file = "geojson/county_geojson.json")
 
 datasets <- list(age_dataset,
                  county_new_dataset,
@@ -1165,6 +1076,7 @@ if(!all_same_date(datasets)) {
 
 curr_date <- curr_dataset_date(datasets)
 fcurr_date <- formatted_date(curr_date)
+mcurr_date <- format(curr_date, "%m/%d/%Y")
 
 if(is.element(curr_date, dataset_dir())) {
   msg <- paste("INFO: Datasets already exist for", fcurr_date, "in 'datasets' folder.")
@@ -1224,15 +1136,17 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
     c_name_list <- c(c_name_list, c_name)
     
     l_names <- c("total_cases", "total_deaths",
-                 "daily_cases", "daily_deaths", "active_cases",
-                 "daily_active", "total_recoveries", "daily_recoveries",
-                 "total_hospitalized", "daily_hospitalized")
+                 "daily_cases", "daily_deaths", "testing", 
+                 "active_cases", "daily_active", "total_recoveries", 
+                 "daily_recoveries", "total_hospitalized", "daily_hospitalized")
       
     tcp <- total_cases_plot(county)
     tdp <- total_deaths_plot(county)
     
     dcp <- daily_cases_plot(county)
     ddp <- daily_deaths_plot(county)
+    
+    dtest <- daily_testing_data_plot(county)
     
     cac <- current_active_cases_plot(county)
     dac <- daily_active_cases_plot(county)
@@ -1243,7 +1157,7 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
     th <- total_hospitalized_plot(county)
     dh <- daily_hospitalizations_plot(county)
     
-    plot_list <- list(tcp, tdp, dcp, ddp, cac, dac, tr, dr, th, dh)
+    plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh)
     names(plot_list) <- l_names
     
     c_list <- append(c_list, list(plot_list))
@@ -1300,7 +1214,24 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   #tdm <- total_deaths_map(county_new_superlist)
   
   #dcm <- daily_cases_map(county_new_superlist)
-  #ddm <- daily_deaths_map(county_new_superlist)
+  #m_names <- c("total_cases", "total_deaths", "daily_cases", "daily_deaths", "testing", "active_cases")
+  tcm <- total_cases_map(county_new_superlist)
+  tdm <- total_deaths_map(county_new_superlist)
+  dcm <- daily_cases_map(county_new_superlist)
+  ddm <- daily_deaths_map(county_new_superlist)
+  tm <- total_tests_map(county_new_superlist)
+  acm <- current_active_cases_map(county_new_superlist)
+  dacm <- daily_active_cases_map(county_new_superlist)
+  trm <- total_recovered_map(county_new_superlist)
+  drm <- daily_recovered_map(county_new_superlist)
+  thm <- total_hospitalizations_map(county_new_superlist)
+  dhm <- daily_hospitalizations_map(county_new_superlist)
+   
+  map_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm)
+  names(map_list) <- l_names
+   
+  json_map_list <- toJSON(map_list)
+  write(json_map_list, file = 'maps.json')
   
   #dtestm <- total_tests_map(county_new_superlist)
   
