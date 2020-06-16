@@ -205,16 +205,6 @@ total_cases_plot <- function(ds) {
   
   fdate <- format(ds$DATE, '%Y-%m-%d')
   
-  #result <- plot_ly(data = ds) 
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = ~TOTAL_CASES, type = 'scatter', 
-  #                               mode = 'lines',
-  #                              line = list(color = 'rgba(0, 164, 179, 1)'))
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Confirmed Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
-  
   export <- list(xval = fdate, 
                  yval = ds$TOTAL_CASES, 
                  linecolor = 'rgb(0, 164, 179)', 
@@ -231,16 +221,7 @@ total_deaths_plot <- function(ds) {
   g_title <- paste('Total Confirmed COVID-19 Deaths in ', county, ", TN", sep = '')
   
   fdate <- format(ds$DATE, '%Y-%m-%d')
-  
-  #result <- plot_ly(data = ds) 
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = ~TOTAL_DEATHS, type = 'scatter', 
-  #                               mode = 'lines', line = list(color = 'rgba(255, 93, 87, 255'))
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Confirmed Deaths'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
-  
+
   export <- list(xval = fdate, 
                  yval = ds$TOTAL_DEATHS, 
                  linecolor = 'rgb(255, 93, 87)', 
@@ -258,24 +239,6 @@ daily_cases_plot <- function(ds) {
   g_title <- paste('Daily Confirmed COVID-19 Cases in ', county, ", TN", sep = '')
   
   fdate <- format(ds$DATE, '%Y-%m-%d')
-  
-  #result <- plot_ly(data = ds, showlegend = FALSE, hoverinfo = 'skip') 
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = ~NEW_CASES, type = 'bar', 
-  #                               marker = list(color = 'rgba(0, 182, 199, 0.5)'),
-  #                               hoverinfo = 'x+y')
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = mov_avg, 
-  #                               type = 'scatter',
-  #                               mode  = 'lines',
-  #                               fill = 'tozeroy',
-  #                               fillcolor = 'rgba(0, 182, 199, 0.25)', 
-  #                               line = list(color = 'rgba(0, 164, 179, 1)'),
-  #                               hoverinfo = 'skip')
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                           yaxis = list(title = 'Daily Confirmed Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
   export <- list(xval = fdate, 
                  yval = ds$NEW_CASES, 
@@ -297,24 +260,6 @@ daily_deaths_plot <- function(ds) {
   g_title <- paste('Daily Confirmed COVID-19 Deaths in ', county, ", TN", sep = '')
   
   fdate <- format(ds$DATE, '%Y-%m-%d')
-  
-  #result <- plot_ly(data = ds, showlegend = FALSE, hoverinfo = 'skip') 
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = ~NEW_DEATHS, type = 'bar', 
-  #                               marker = list(color = 'rgba(255, 124, 120, 0.5)'),
-  #                               hoverinfo = 'x+y')
-  #result <- result %>% add_trace(x = ~DATE, 
-  #                               y = mov_avg, 
-  #                               type = 'scatter',
-  #                               mode  = 'lines',
-  #                               fill = 'tozeroy',
-  #                              fillcolor = 'rgba(255, 124, 120, 0.25)', 
-  #                               line = list(color = 'rgba(255, 93, 87, 1)'),
-  #                               hoverinfo = 'skip')
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Daily Confirmed Deaths'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
   export <- list(xval = fdate, 
                  yval = ds$NEW_DEATHS, 
@@ -405,16 +350,6 @@ current_active_cases_plot <- function(ds) {
   
   fdate <- format(mod_date, '%Y-%m-%d')
   
-  #result <- plot_ly(data = ds) 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_active, type = 'scatter', 
-  #                               mode = 'lines',
-  #                               line = list(color = 'rgba(0, 219, 69, 255'))
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Active Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
-  
   export <- list(xval = fdate, 
                  yval = mod_active, 
                  linecolor = 'rgb(0, 219, 69)', 
@@ -436,24 +371,6 @@ daily_active_cases_plot <- function(ds) {
   g_title <- paste('Daily Change of Active COVID-19 Cases in ', county, ", TN", sep = '')
   
   fdate <- format(mod_date, '%Y-%m-%d')
-
-  #result <- plot_ly(data = ds, showlegend = FALSE, hoverinfo = 'skip') 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_new_active, type = 'bar', 
-  #                               marker = list(color = 'rgba(56, 209, 105 0.5)'),
-  #                               hoverinfo = 'x+y')
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mov_avg, 
-  #                              type = 'scatter',
-  #                               mode  = 'lines',
-  #                               fill = 'tozeroy',
-  #                               fillcolor = 'rgba(56, 209, 105 0.25)', 
-  #                               line = list(color = 'rgba(0, 219, 69, 255'),
-  #                               hoverinfo = 'skip')
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Daily Change of Active Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
   export <- list(xval = fdate, 
                  yval = mod_new_active, 
@@ -479,16 +396,6 @@ total_recovered_plot <- function(ds) {
   
   fdate <- format(mod_date, '%Y-%m-%d')
   
-  #result <- plot_ly(data = ds) 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_rec, type = 'scatter', 
-  #                               mode = 'lines',
-  #                               line = list(color = 'rgba(231, 235, 30, 1)'))
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Recovered Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
-  
   export <- list(xval = fdate, 
                  yval = mod_rec, 
                  linecolor = 'rgb(231, 235, 30)', 
@@ -510,24 +417,6 @@ daily_recovered_plot <- function(ds) {
   g_title <- paste('Daily Recovered COVID-19 Cases in ', county, ", TN", sep = '')
   
   fdate <- format(mod_date, '%Y-%m-%d')
-  
-  #result <- plot_ly(data = ds, showlegend = FALSE, hoverinfo = 'skip') 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_daily_rec, type = 'bar', 
-  #                               marker = list(color = 'rgba(197, 201, 22, 0.5)'),
-  #                               hoverinfo = 'x+y')
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mov_avg, 
-  #                               type = 'scatter',
-  #                               mode  = 'lines',
-  #                               fill = 'tozeroy',
-  #                               fillcolor = 'rgba(197, 201, 22, 0.25)', 
-  #                               line = list(color = 'rgba(231, 235, 30, 1)'),
-  #                               hoverinfo = 'skip')
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                           yaxis = list(title = 'Daily Recovered Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
   export <- list(xval = fdate, 
                  yval = mod_daily_rec, 
@@ -553,16 +442,6 @@ total_hospitalized_plot <- function(ds) {
   
   fdate <- format(mod_date, '%Y-%m-%d')
   
-  #result <- plot_ly(data = ds) 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_hosp, type = 'scatter', 
-  #                               mode = 'lines',
-  #                               line = list(color = 'rgba(245, 99, 15, 1)'))
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Hospitalized Cases'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
-  
   export <- list(xval = fdate, 
                  yval = mod_hosp, 
                  linecolor = 'rgb(245, 99, 15)', 
@@ -584,24 +463,6 @@ daily_hospitalizations_plot <- function(ds) {
   g_title <- paste('Daily COVID-19 Hospitalizations in ', county, ", TN", sep = '')
   
   fdate <- format(mod_date, '%Y-%m-%d')
-  
-  #result <- plot_ly(data = ds, showlegend = FALSE, hoverinfo = 'skip') 
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mod_daily_hosp, type = 'bar', 
-  #                               marker = list(color = 'rgba(245, 136, 73, 0.5)'),
-  #                               hoverinfo = 'x+y')
-  #result <- result %>% add_trace(x = mod_date, 
-  #                               y = mov_avg, 
-  #                               type = 'scatter',
-  #                               mode  = 'lines',
-  #                               fill = 'tozeroy',
-  #                               fillcolor = 'rgba(245, 136, 73, 0.25)', 
-  #                               line = list(color = 'rgba(245, 99, 15, 1)'),
-  #                               hoverinfo = 'skip')
-  #result <- result %>% layout(xaxis = list(title = 'Date'),
-  #                            yaxis = list(title = 'Daily Hospitalizations'),
-  #                            title = g_title)
-  #result <- result %>% config(displayModeBar = FALSE, displaylogo = FALSE, responsive = TRUE)
   
   export <- list(xval = fdate, 
                  yval = mod_daily_hosp, 
@@ -642,7 +503,7 @@ total_cases_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$total_cases, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Total COVID-19 Cases",
                  hovtext = "Total cases:",
                  col1 = 'rgb(255, 255, 255)',
@@ -676,7 +537,7 @@ total_deaths_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$total_deaths, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Total COVID-19 Deaths",
                  hovtext = "Total deaths:",
                  col1 = 'rgb(255, 255, 255)',
@@ -710,7 +571,7 @@ daily_cases_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$new_cases, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = paste("Daily COVID-19 Cases:", mcurr_date),
                  hovtext = "New cases:",
                  col1 = 'rgb(255, 255, 255)',
@@ -744,7 +605,7 @@ daily_deaths_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$new_deaths, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = paste("Daily COVID-19 Deaths:", mcurr_date),
                  hovtext = "New deaths:",
                  col1 = 'rgb(255, 255, 255)',
@@ -778,7 +639,7 @@ total_tests_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$total_tests, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Total COVID-19 Tests",
                  hovtext = "Total tests performed:",
                  col1 = 'rgb(255, 255, 255)',
@@ -812,7 +673,7 @@ current_active_cases_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$current_active_cases, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Active COVID-19 Cases",
                  hovtext = "Active cases:",
                  col1 = 'rgb(255, 255, 255)',
@@ -846,7 +707,7 @@ daily_active_cases_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$daily_active_cases, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = paste("Daily Change of Active COVID-19 Cases:", mcurr_date),
                  hovtext = "Net change of active cases:",
                  col1 = 'rgb(255, 255, 255)',
@@ -880,7 +741,7 @@ total_recovered_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$total_recovered, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Total COVID-19 Recoveries",
                  hovtext = "Recovered cases:",
                  col1 = 'rgb(255, 255, 255)',
@@ -914,7 +775,7 @@ daily_recovered_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$daily_recovered, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = paste("Daily COVID-19 Recoveries:", mcurr_date),
                  hovtext = "New recoveries:",
                  col1 = 'rgb(255, 255, 255)',
@@ -948,7 +809,7 @@ total_hospitalizations_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$total_hospitalizations, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = "Total COVID-19 Hospitalizations",
                  hovtext = "Total hospitalizations:",
                  col1 = 'rgb(255, 255, 255)',
@@ -982,7 +843,7 @@ daily_hospitalizations_map <- function(superlist) {
   
   export <- list(counties = df$names, 
                  z = df$new_hospitalizations, 
-                 type = "map", 
+                 type = "cmap", 
                  mtitle = paste("Daily COVID-19 Hospitalizations:", mcurr_date),
                  hovtext = "New hospitalizations:",
                  col1 = 'rgb(255, 255, 255)',
@@ -994,6 +855,240 @@ daily_hospitalizations_map <- function(superlist) {
   return(export)
 }
 
+######################################
+# State maps
+######################################
+
+total_cases_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_CASES, n = 1),
+                  "Total cases:",
+                  'rgb(105, 201, 245)',
+                  "Total COVID-19 Cases"))
+}
+
+total_deaths_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_DEATHS, n = 1),
+                   "New cases:",
+                   'rgb(240, 101, 101)',
+                   "Total COVID-19 Deaths"))
+}
+
+daily_cases_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$NEW_CASES, n = 1),
+                   "New cases:",
+                   'rgb(105, 201, 245)',
+                   paste("New COVID-19 Cases:", mcurr_date)))
+}
+
+daily_deaths_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$NEW_DEATHS, n = 1),
+                   "New deaths:",
+                   'rgb(240, 101, 101)',
+                   paste("New COVID-19 Deaths:", mcurr_date)))
+}
+
+testing_data_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_TESTS, n = 1),
+                   "Total tests:",
+                   'rgb(219, 122, 255)',
+                   "Total COVID-19 Tests Performed"))
+}
+
+active_cases_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_ACTIVE, n = 1),
+                   "Active cases:",
+                   'rgb(105, 255, 142)',
+                   "Active COVID-19 Cases"))
+}
+
+daily_active_cases_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$NEW_ACTIVE, n = 1),
+                   "Net change of active cases:",
+                   'rgb(105, 255, 142)',
+                   paste("New Active COVID-19 Cases:", mcurr_date)))
+}
+
+total_recovered_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_RECOVERED, n = 1),
+                   "Total recovered:",
+                   'rgb(248, 255, 102)',
+                   "Total COVID-19 Recoveries"))
+}
+
+
+daily_recovered_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$NEW_RECOVERED, n = 1),
+                   "New recoveries:",
+                   'rgb(248, 255, 102)',
+                   paste("New COVID-19 Recoveries:", mcurr_date)))
+}
+
+total_hospitalizations_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$TOTAL_HOSP, n = 1),
+                   "Total hospitalized:",
+                   'rgb(255, 175, 110)',
+                   "Total COVID-19 Hospitalizations"))
+}
+
+daily_hospitalizations_state_map <- function() {
+  return(state_map(tail(daily_case_info_dataset$NEW_HOSP, n = 1),
+                   "New hospitalizations:",
+                   'rgb(255, 175, 110)',
+                   paste("New COVID-19 Hospitalizations:", mcurr_date)))
+}
+
+######################################
+# Abstract functions
+######################################
+
+
+total_plot <- function(xval, yval, linecolor, gtitle, ytitle) {
+  fdate <- format(xval, "%Y-%m-%d")
+  
+  export <- list(xval = fdate, 
+                 yval = yval, 
+                 linecolor = linecolor, 
+                 gtitle = gtitle, 
+                 ytitle = ytitle,
+                 type = "total")
+  return(export)
+}
+
+daily_plot <- function(xval, yval, barcolor, fillcolor, movingAverage, movingLineColor, gtitle, ytitle) {
+  fdate <- format(xval, "%Y-%m-%d")
+  
+  export <- list(xval = fdate, 
+                 yval = yval, 
+                 barcolor = barcolor, 
+                 fillcolor = fillcolor, 
+                 movingAverage = movingAverage,
+                 movingLineColor = movingLineColor,
+                 gtitle = gtitle, 
+                 ytitle = ytitle,
+                 type = "daily")
+  return(export)
+}
+
+state_map <- function(z, hovtext, col, mtitle) {
+  return(list(z = z,
+              hovtext = hovtext,
+              col = col,
+              mtitle = mtitle,
+              type = "smap"))
+}
+
+######################################
+# State plots
+######################################
+
+total_cases_state_plot <- function() {
+  return(total_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$TOTAL_CASES,
+                    'rgb(0, 164, 179)',
+                    "Total COVID-19 Cases in Tennessee",
+                    "Total cases"))
+}
+
+total_deaths_state_plot <- function() {
+  return(total_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$TOTAL_DEATHS,
+                    'rgb(255, 93, 87)',
+                    "Total COVID-19 Deaths in Tennessee",
+                    "Total deaths"))
+}
+
+daily_cases_state_plot <- function() {
+  mov_avg <- seven_day_average(daily_case_info_dataset$NEW_CASES)
+  
+  return(daily_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$NEW_CASES,
+                    'rgba(0, 182, 199, 0.5)',
+                    'rgba(0, 182, 199, 0.25)',
+                    mov_avg,
+                    'rgb(0, 164, 179)',
+                    "Daily COVID-19 Cases in Tennessee",
+                    "Daily cases"))
+}
+
+daily_deaths_state_plot <- function() {
+  mov_avg <- seven_day_average(daily_case_info_dataset$NEW_DEATHS)
+  
+  return(daily_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$NEW_DEATHS,
+                    'rgba(255, 124, 120, 0.5)',
+                    'rgba(255, 124, 120, 0.25)',
+                    mov_avg,
+                    'rgb(255, 93, 87)',
+                    "Daily COVID-19 Deaths in Tennessee",
+                    "Daily deaths"))
+}
+
+testing_data_state_plot <- function() {
+  
+}
+
+active_cases_state_plot <- function() {
+  return(total_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$TOTAL_ACTIVE,
+                    'rgb(0, 219, 69)',
+                    'Active COVID-19 Cases in Tennessee',
+                    "Active cases"))
+}
+
+daily_active_cases_state_plot <- function() {
+  mov_avg <- seven_day_average(daily_case_info_dataset$NEW_ACTIVE)
+  
+  return(daily_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$NEW_ACTIVE,
+                    'rgba(56, 209, 105, 0.5)',
+                    'rgba(56, 209, 105, 0.25)', 
+                    mov_avg,
+                    'rgb(0, 219, 69)',
+                    "Daily Change of Active COVID-19 Cases in Tennessee",
+                    "Daily change of active cases"))
+}
+
+total_recovered_state_plot <- function() {
+  return(total_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$TOTAL_RECOVERED,
+                    'rgb(231, 235, 30)',
+                    'Total Recovered COVID-19 Cases in Tennessee',
+                    'Total recovered cases'))
+}
+
+daily_recovered_state_plot <- function() {
+  mov_avg <- seven_day_average(daily_case_info_dataset$NEW_RECOVERED)
+  
+  return(daily_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$NEW_RECOVERED,
+                    'rgba(197, 201, 22, 0.5)',
+                    'rgba(197, 201, 22, 0.25)', 
+                    mov_avg,
+                    'rgb(231, 235, 30)',
+                    "Daily Recovered COVID-19 Cases in Tennessee",
+                    "Daily recovered cases"))
+}
+
+total_hospitalizations_state_plot <- function() {
+  return(total_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$TOTAL_HOSP,
+                    'rgb(245, 99, 15)',
+                    'Total COVID-19 Hospitalizations in Tennessee',
+                    'Total hospitalizations'))
+}
+
+daily_hospitalizations_state_plot <- function() {
+  mov_avg <- seven_day_average(daily_case_info_dataset$NEW_HOSP)
+  
+  return(daily_plot(daily_case_info_dataset$DATE,
+                    daily_case_info_dataset$NEW_HOSP,
+                    'rgba(245, 136, 73, 0.5)',
+                    'rgba(245, 136, 73, 0.25)',
+                    mov_avg,
+                    'rgb(245, 99, 15)',
+                    "Daily COVID-19 Hospitalizations in Tennessee",
+                    "Daily hospitalizations"))
+}
 
 ######################################
 # Script
@@ -1064,6 +1159,7 @@ daily_case_info_dataset <- load_file(daily_case_info_temp_path, daily_case_info_
 race_ethnicity_sex_dataset <- load_file(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
 fips <- read.csv(file = 'fips/tn-counties.csv', stringsAsFactors = FALSE, colClasses = fips_col_types)
 county_geojson <- rjson::fromJSON(file = "geojson/county_geojson.json")
+tn_geojson <- rjson::fromJSON(file = 'geojson/tn_geojson.json')
 
 datasets <- list(age_dataset,
                  county_new_dataset,
@@ -1161,60 +1257,13 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
     names(plot_list) <- l_names
     
     c_list <- append(c_list, list(plot_list))
-    
-    #dtest <- daily_testing_data_plot(county)
-    
-    #c_dir <- paste(ppath, c_name, sep="/")
-    
-    #dir.create(c_dir)
-    
-    #tcp_file <- 'total_cases_plot.json'
-    #tdp_file <- 'total_deaths_plot.json'
-    #dcp_file <- 'daily_cases_plot.json'
-    #ddp_file <- 'daily_deaths_plot.json'
-    #dtest_file <- 'daily_testing_data_plot.json'
-    #cac_file <- 'current_active_cases_plot.json'
-    #dac_file <- 'daily_active_cases_plot.json'
-    #tr_file <- 'total_recovered_plot.json'
-    #dr_file <- 'daily_recovered_plot.json'
-    #th_file <- 'total_hospitalized_plot.json'
-    #dh_file <- 'daily_hospitalizations_plot.json'
-    
-    #tcp <- plotly_json(tcp, FALSE)
-    #tdp <- plotly_json(tdp, FALSE)
-    #dcp <- plotly_json(dcp, FALSE)
-    #ddp <- plotly_json(ddp, FALSE)
-    #dtest <- plotly_json(dtest, FALSE)
-    #cac <- plotly_json(cac, FALSE)
-    #dac <- plotly_json(dac, FALSE)
-    #tr <- plotly_json(tr, FALSE)
-    #dr <- plotly_json(dr, FALSE)
-    #th <- plotly_json(th, FALSE)
-    #dh <- plotly_json(dh, FALSE)
-    
-    #write(tcp, paste(c_dir, tcp_file, sep = "/"))
-    #write(tdp, paste(c_dir, tdp_file, sep = "/"))
-    #write(dcp, paste(c_dir, dcp_file, sep = "/"))
-    #write(ddp, paste(c_dir, ddp_file, sep = "/"))
-    #write(dtest, paste(c_dir, dtest_file, sep = "/"))
-    #write(cac, paste(c_dir, cac_file, sep = "/"))
-    #write(dac, paste(c_dir, dac_file, sep = "/"))
-    #write(tr, paste(c_dir, tr_file, sep = "/"))
-    #write(dr, paste(c_dir, dr_file, sep = "/"))
-    #write(th, paste(c_dir, th_file, sep = "/"))
-    #write(dh, paste(c_dir, dh_file, sep = "/"))
   }
   
   names(c_list) <- c_name_list
   
   json_list <- toJSON(c_list)
   write(json_list, file = "counties.json")
-  
-  #tcm <- total_cases_map(county_new_superlist)
-  #tdm <- total_deaths_map(county_new_superlist)
-  
-  #dcm <- daily_cases_map(county_new_superlist)
-  #m_names <- c("total_cases", "total_deaths", "daily_cases", "daily_deaths", "testing", "active_cases")
+
   tcm <- total_cases_map(county_new_superlist)
   tdm <- total_deaths_map(county_new_superlist)
   dcm <- daily_cases_map(county_new_superlist)
@@ -1227,87 +1276,47 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   thm <- total_hospitalizations_map(county_new_superlist)
   dhm <- daily_hospitalizations_map(county_new_superlist)
    
-  map_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm)
-  names(map_list) <- l_names
+  cmap_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm)
+  names(cmap_list) <- l_names
    
-  json_map_list <- toJSON(map_list)
-  write(json_map_list, file = 'maps.json')
+  json_cmap_list <- toJSON(cmap_list)
+  write(json_cmap_list, file = 'cmaps.json')
   
-  #dtestm <- total_tests_map(county_new_superlist)
+  tcsm <- total_cases_state_map()
+  tdsm <- total_deaths_state_map()
+  dcsm <- daily_cases_state_map()
+  ddsm <- daily_deaths_state_map()
+  tsm <- testing_data_state_map()
+  acsm <- active_cases_state_map()
+  dacsm <- daily_active_cases_state_map()
+  trsm <- total_recovered_state_map()
+  drsm <- daily_recovered_state_map()
+  thsm <- total_hospitalizations_state_map()
+  dhsm <- daily_hospitalizations_state_map()
   
-  #cacm <- current_active_cases_map(county_new_superlist)
-  #dacm <- daily_active_cases_map(county_new_superlist)
+  smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dhsm)
+  names(smap_list) <- l_names
   
-  #trm <- total_recovered_map(county_new_superlist)
-  #drm <- daily_recovered_map(county_new_superlist)
+  json_smap_list <- toJSON(smap_list)
+  write(json_smap_list, file = 'smaps.json')
   
-  #thm <- total_hospitalizations_map(county_new_superlist)
-  #dhm <- daily_hospitalizations_map(county_new_superlist)
+  tcsp <- total_cases_state_plot()
+  tdsp <- total_deaths_state_plot()
+  dcsp <- daily_cases_state_plot()
+  ddsp <- daily_deaths_state_plot()
+  #tsp <- testing_state_plot()
+  acsp <- active_cases_state_plot()
+  dacsp <- daily_active_cases_state_plot()
+  trsp <- total_recovered_state_plot()
+  drsp <- daily_recovered_state_plot()
+  thsp <- total_hospitalizations_state_plot()
+  dhsp <- daily_hospitalizations_state_plot()
   
-  #tcm_file <- 'total_cases_map.json'
-  #tdm_file <- 'total_deaths_map.json'
-  #dcm_file <- 'daily_cases_map.json'
-  #ddm_file <- 'daily_deaths_map.json'
-  #dtestm_file <- 'daily_testing_data_map.json'
-  #cacm_file <- 'current_active_cases_map.json'
-  #dacm_file <- 'daily_active_cases_map.json'
-  #trm_file <- 'total_recovered_map.json'
-  #drm_file <- 'daily_recovered_map.json'
-  #thm_file <- 'total_hospitalized_map.json'
-  #dhm_file <- 'daily_hospitalizations_map.json'
+  state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, list(), acsp, dacsp, trsp, drsp, thsp, dhsp)
+  names(state_plot_list) <- l_names
   
-  #tcm <- plotly_json(tcm, FALSE)
-  #tdm <- plotly_json(tdm, FALSE)
-  #dcm <- plotly_json(dcm, FALSE)
-  #ddm <- plotly_json(ddm, FALSE)
-  #dtestm <- plotly_json(dtestm, FALSE)
-  #cacm <- plotly_json(cacm, FALSE)
-  #dacm <- plotly_json(dacm, FALSE)
-  #trm <- plotly_json(trm, FALSE)
-  #drm <- plotly_json(drm, FALSE)
-  #thm <- plotly_json(thm, FALSE)
-  #dhm <- plotly_json(dhm, FALSE)
-  
-  #write(tcm, paste(mpath, tcm_file, sep = "/"))
-  #write(tdm, paste(mpath, tdm_file, sep = "/"))
-  #write(dcm, paste(mpath, dcm_file, sep = "/"))
-  #write(ddm, paste(mpath, ddm_file, sep = "/"))
-  #write(dtestm, paste(mpath, dtestm_file, sep = "/"))
-  #write(cacm, paste(mpath, cacm_file, sep = "/"))
-  #write(dacm, paste(mpath, dacm_file, sep = "/"))
-  #write(trm, paste(mpath, trm_file, sep = "/"))
-  #write(drm, paste(mpath, drm_file, sep = "/"))
-  #write(thm, paste(mpath, thm_file, sep = "/"))
-  #write(dhm, paste(mpath, dhm_file, sep = "/"))
-  
- # plot_files <- list()
-  
- # county_files <- list.files(ppath, all.files = FALSE, no.. = TRUE)
-  
-  
-  #for(cfold in county_files) {
-   # files <- list.files(paste(ppath, cfold, sep="/"), all.files = FALSE, no.. = TRUE)
-  #  json_list <- lapply(as.list(files), function(x) {x <- fromJSON(file = paste(ppath, cfold, x, sep="/"))})
-  #  listnames <- gsub(".json$", "", files)
-  #  names(json_list) <- listnames
-    
-  #  plot_files <- append(plot_files, list(json_list))
-  #}
-  
-#  county_files <- tolower(county_files)
-#  names(plot_files) <- county_files
-  
-#  map_file_list <- list.files(mpath, all.files = FALSE, no.. = TRUE)
-#  map_files <- list()
-  
-#  mjson_list <- lapply(as.list(map_file_list), function(x) {x <- fromJSON(file = paste(mpath, x, sep="/"))})
-##  m_list_names <- gsub(".json$", "", map_file_list)
-#  names(mjson_list) <- m_list_names
-  
- # alljson <- list(mjson_list, plot_files)
-#  names(alljson) <- c("map", "graph")
-  
- # write(toJSON(alljson), file = "alljson/allplots.json")
+  json_state_plots <- toJSON(state_plot_list)
+  write(json_state_plots, file = 'state.json')
 }
 
 print("Successfully completed.")
