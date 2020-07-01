@@ -25,6 +25,11 @@ convert_date <- function(df, col_list) {
   return(df)
 }
 
+convert_date_race <- function(df, col_list) {
+  df[[col_list[2]]] <- as.Date(df[[col_list[2]]])
+  return(df)
+}
+
 load_file <- function(path, c_type) {
   f <- read_excel(path, col_types = c_type)
   f <- convert_date(f, colnames(f))
@@ -32,8 +37,19 @@ load_file <- function(path, c_type) {
   return(f)
 }
 
+load_file_race <- function(path, c_type) {
+  f <- read_excel(path, col_types = c_type)
+  f <- convert_date_race(f, colnames(f))
+  f[is.na(f)] <- 0
+  return(f)
+}
+
 recent_date <- function(df) {
-  return(df[nrow(df),1][[1]])
+  if(inherits(df[1,1][[1]], 'Date')) {
+    return(df[nrow(df),1][[1]])
+  } else {
+    return(df[nrow(df),2][[1]])
+  }
 }
 
 all_same_date <- function(lof_df) {
@@ -1149,14 +1165,14 @@ daily_case_info_col_types <- c("date", "numeric","numeric", "numeric", "numeric"
                                "numeric", "numeric", "numeric", "numeric",
                                "numeric", "numeric", "numeric", "numeric")
 
-race_ethnicity_sex_col_types <- c("date", "text", "text", "numeric", "numeric", "numeric", "numeric")
+race_ethnicity_sex_col_types <- c("text", "date", "text", "numeric", "numeric", "numeric", "numeric")
 
 fips_col_types <- c("character", "character")
 
 age_dataset <- load_file(age_temp_path, age_col_types)
 county_new_dataset <- load_file(county_new_temp_path, county_new_col_types)
 daily_case_info_dataset <- load_file(daily_case_info_temp_path, daily_case_info_col_types)
-race_ethnicity_sex_dataset <- load_file(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
+race_ethnicity_sex_dataset <- load_file_race(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
 fips <- read.csv(file = 'fips/tn-counties.csv', stringsAsFactors = FALSE, colClasses = fips_col_types)
 county_geojson <- rjson::fromJSON(file = "geojson/county_geojson.json")
 tn_geojson <- rjson::fromJSON(file = 'geojson/tn_geojson.json')
@@ -1320,3 +1336,6 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
 }
 
 print("Successfully completed.")
+
+
+
