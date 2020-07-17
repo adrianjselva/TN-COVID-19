@@ -1040,7 +1040,28 @@ daily_deaths_state_plot <- function() {
 }
 
 testing_data_state_plot <- function() {
+  g_title <- 'Daily Testing Data for Tennessee'
   
+  start_index <- first_nonzero_index(daily_case_info_dataset$NEW_TESTS)
+  mod_date_range <- daily_case_info_dataset$DATE[start_index:length(daily_case_info_dataset$DATE)]
+  mod_test_range <- daily_case_info_dataset$NEW_TESTS[start_index:length(daily_case_info_dataset$NEW_TESTS)]
+  mod_pos_range <- daily_case_info_dataset$NEW_CASES[start_index:length(daily_case_info_dataset$NEW_CASES)]
+  
+  fdate <- format(mod_date_range, '%Y-%m-%d')
+  
+  percent_positve <- (mod_pos_range / mod_test_range) * 100
+  percent_positve <- round(percent_positve, 1)
+  percent_positve[which(!is.finite(percent_positve))] <- 0.0
+  percent_positve[which(percent_positve < 0.0)] <- 0.0
+  
+  export <- list(xval = fdate, 
+                 totalTestVal = mod_test_range,
+                 positiveVals = mod_pos_range,
+                 percentPositive = percent_positve,
+                 gtitle = g_title,
+                 type = "testing")
+  
+  return(export)
 }
 
 active_cases_state_plot <- function() {
@@ -1105,6 +1126,81 @@ daily_hospitalizations_state_plot <- function() {
                     "Daily COVID-19 Hospitalizations in Tennessee",
                     "Daily hospitalizations"))
 }
+
+######################################
+# Plotly Objects
+######################################
+
+county_map_plotly <- function(l) {
+  hov_temp <- paste('<br>', l[["hovtext"]],' %{z}<extra></extra>', sep='')
+  
+  fig <- plot_ly(width = 960, height = 540)
+  
+  fig <- fig %>% add_trace(
+    type = "choropleth",
+    geojson = county_geojson,
+    locations = l[["counties"]],
+    z = l[["z"]],
+    featureidkey = "properties.NAME",
+    colorscale = list(
+      c(0, l[["col1"]]),
+      c(0.01, l[["col2"]]),
+      c(0.33, l[["col3"]]),
+      c(0.66, l[["col4"]]),
+      c(1, l[["col5"]])
+    ),
+    showscale = FALSE,
+    zmin = 0,
+    zmax = max(l[["z"]]),
+    hovertemplate = paste('<b>%{location}</b>', hov_temp, sep=''),
+    marker = list(
+      opacity = 0.75,
+      line = list(
+        color = "#000000"
+      )
+    )
+  )
+  
+  fig <- fig %>% layout(
+    title = l[["mtitle"]],
+    geo = list(
+      showframe = FALSE,
+      fitbounds = "locations",
+      visible = FALSE,
+      projection = list(type = 'mercator')
+    ),
+    margin = list(
+      l = 0,
+      r = 0,
+      b = 0,
+      t = 20,
+      pad = 2
+    )
+  )
+  
+  fig <- fig %>% config(
+    displayModeBar = FALSE,
+    staticPlot = TRUE
+  )
+  
+  return(fig)
+}
+
+johns_formula <- function() {
+  l <- c()
+  
+  for(i in 1:length(sum$NEW_CASES)) {
+    if(i <= 21) {
+      l <- c(l, 0)
+    } else {
+      l <- c(l, sum(sum$NEW_CASES[(i-19):i]))
+    }
+  }
+  
+  return(l)
+}
+
+
 
 ######################################
 # Script
@@ -1320,7 +1416,7 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   tdsp <- total_deaths_state_plot()
   dcsp <- daily_cases_state_plot()
   ddsp <- daily_deaths_state_plot()
-  #tsp <- testing_state_plot()
+  tsp <- testing_data_state_plot()
   acsp <- active_cases_state_plot()
   dacsp <- daily_active_cases_state_plot()
   trsp <- total_recovered_state_plot()
@@ -1328,7 +1424,7 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   thsp <- total_hospitalizations_state_plot()
   dhsp <- daily_hospitalizations_state_plot()
   
-  state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, list(), acsp, dacsp, trsp, drsp, thsp, dhsp)
+  state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, thsp, dhsp)
   names(state_plot_list) <- l_names
   
   json_state_plots <- toJSON(state_plot_list)
