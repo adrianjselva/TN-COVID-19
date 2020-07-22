@@ -1251,7 +1251,7 @@ print("Loading files...")
 age_col_types <- c("date", "text", "numeric", "numeric", "numeric", 
                    "numeric", "numeric", "numeric")
 
-county_new_col_types <- c("date", "text", "numeric", "numeric","numeric", "numeric","numeric",
+county_new_col_types <- c("date", "text", "numeric", "numeric", "numeric","numeric", "numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric", "numeric")
