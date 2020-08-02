@@ -1,16 +1,27 @@
-accessToken
+# Mac-specific
 .DS_Store
+
+maps/.DS_Store
+maps/county/.DS_Store
+maps/state/.DS_Store
+
+plots/.DS_Store
+plots/county/.DS_Store
+plots/state/.DS_Store
+
+# RStudio files
 .RData
 .Rhistory
-counties.json
-maps/
-plots/
+.Rproj.user/
+TDOH Data.Rproj
+
+# Mapbox access token
+accessToken
+
+# Data directories
 counties/
 datasets/
-cmaps.json
-smaps.json
-state.json
-alljson/
-.Rproj.user/
-counties.zip
-TDOH Data.Rproj
+output/
+
+# Work in progress
+maps/static_county_map.R
