@@ -7,6 +7,7 @@
 library(readxl)
 library(rjson)
 library(plotly)
+library(tools)
 
 ######################################
 # Functions
@@ -148,10 +149,11 @@ split_by_date <- function(dataset) {
 
 split_by_county <- function(dataset) {
   county_list <- list()
+  cnames <- c()
   
   for(c_name in unique(dataset$COUNTY)) {
     
-    if(c_name == "Pending" || c_name == "Out of State") {
+    if(c_name == "Out of State") {
       next
     }
     
@@ -161,10 +163,25 @@ split_by_county <- function(dataset) {
       f_code <- "0"
     }
     c_data$FIPS <- f_code
+    c_data$COUNTY <- tolower(c_data$COUNTY)
+    c_data$COUNTY <- tools::toTitleCase(c_data$COUNTY)
+    
+    if(c_data$COUNTY[1] == "Mcminn") {
+      c_data$COUNTY <- rep("McMinn", length(c_data$COUNTY))
+    }
+    
+    if(c_data$COUNTY[1] == "Mcnairy") {
+      c_data$COUNTY <- rep("McNairy", length(c_data$COUNTY))
+    }
+    
+    cnames <- c(cnames, c_data$COUNTY[1])
+    
     c_data <- list(c_data)
     
     county_list <- append(county_list, c_data)
   }
+  
+  names(county_list) <- cnames
   
   return(county_list)
 }
@@ -186,11 +203,7 @@ first_nonzero_index <- function(col) {
   while(i_found == FALSE) {
     i <- i + 1
     
-    if (col[i + 1] <= 10 && col[i + 1] > 0 && col[i] == 0) {
-      return(i)
-    } else if (col[i] > 0) {
-      return(i)
-    } else if (col[i] < 0) {
+    if(col[i] != 0) {
       return(i)
     }
   }
@@ -208,6 +221,51 @@ seven_day_average <- function(daily_cases) {
   }
   
   return(mov_avg)
+}
+
+add_new_positive_tests_cty <- function(super) {
+  if("NEW_POS_TESTS" %in% names(super[[1]])) {
+    return(super)
+  }
+  
+  npt <- lapply(super, function(cty) {
+    cty$NEW_POS_TESTS <- c(0, diff(cty$POS_TESTS))
+    cty$NEW_POS_TESTS[(first_nonzero_index(cty$NEW_POS_TESTS))] <- 0
+    
+    pos_test_index <- which(colnames(cty) == "POS_TESTS")
+    
+    cty <- cty[, c(1:(pos_test_index), ncol(cty), (pos_test_index + 2):(ncol(cty) - 1))]
+    
+    return(cty)
+  })
+
+  
+  return(npt)
+}
+
+add_new_positive_tests_state <- function(ds) {
+  if("NEW_POS_TESTS" %in% colnames(ds)) {
+    return(ds)
+  }
+  
+  ds$NEW_POS_TESTS <- c(0, diff(ds$POS_TESTS))
+  ds$NEW_POS_TESTS[(first_nonzero_index(ds$NEW_POS_TESTS))] <- 0
+  
+  pos_test_index <- which(colnames(ds) == "POS_TESTS")
+    
+  ds <- ds[, c(1:(pos_test_index), ncol(ds), (pos_test_index + 2):(ncol(ds) - 1))]
+  
+  return(ds)
+}
+
+rename_specimen_col <- function(sl) {
+  nsl <- lapply(sl, function(cty) {
+    colnames(cty)[colnames(cty) == "COUNTY_CASE_COUNT"] <- "NEW_CASES"
+    
+    return(cty)
+  })
+  
+  return(nsl)
 }
 
 ######################################
@@ -263,7 +321,28 @@ daily_cases_plot <- function(ds) {
                  movingAverage = mov_avg,
                  movingLineColor = 'rgb(0, 164, 179)',
                  gtitle = g_title, 
-                 ytitle = "Daily Confirmed Cases",
+                 ytitle = "New Cases",
+                 type = "daily")
+  
+  return(export)
+}
+
+daily_cases_specimen_plot <- function(ds) {
+  mov_avg <- seven_day_average(ds$NEW_CASES)
+  
+  county <- paste(ds$COUNTY[1], 'County')
+  g_title <- paste('Daily COVID-19 Cases by Specimen Collection Date in ', county, ", TN", sep = '')
+  
+  fdate <- format(ds$DATE, '%Y-%m-%d')
+  
+  export <- list(xval = fdate, 
+                 yval = ds$NEW_CASES, 
+                 barcolor = 'rgba(0, 182, 199, 0.5)', 
+                 fillcolor = 'rgba(0, 182, 199, 0.25)', 
+                 movingAverage = mov_avg,
+                 movingLineColor = 'rgb(0, 164, 179)',
+                 gtitle = g_title, 
+                 ytitle = "New Cases (Specimen Collection Date)",
                  type = "daily")
   
   return(export)
@@ -298,12 +377,12 @@ daily_testing_data_plot <- function(ds) {
   start_index <- first_nonzero_index(ds$NEW_TESTS)
   mod_date_range <- ds$DATE[start_index:length(ds$DATE)]
   mod_test_range <- ds$NEW_TESTS[start_index:length(ds$NEW_TESTS)]
-  mod_pos_range <- ds$NEW_CASES[start_index:length(ds$NEW_CASES)]
+  mod_pos_range <- ds$NEW_POS_TESTS[start_index:length(ds$NEW_POS_TESTS)]
   
   y2 <- list(
     overlaying = "y",
     side = "right",
-    title = "Positive (%)",
+    title = "Percent Positive (7-day Average)",
     rangemode = 'tozero',
     showgrid = FALSE
   )
@@ -311,6 +390,7 @@ daily_testing_data_plot <- function(ds) {
   fdate <- format(mod_date_range, '%Y-%m-%d')
   
   percent_positve <- (mod_pos_range / mod_test_range) * 100
+  percent_positve <- seven_day_average(percent_positve)
   percent_positve <- round(percent_positve, 1)
   percent_positve[which(!is.finite(percent_positve))] <- 0.0
   percent_positve[which(percent_positve < 0.0)] <- 0.0
@@ -1045,14 +1125,15 @@ testing_data_state_plot <- function() {
   start_index <- first_nonzero_index(daily_case_info_dataset$NEW_TESTS)
   mod_date_range <- daily_case_info_dataset$DATE[start_index:length(daily_case_info_dataset$DATE)]
   mod_test_range <- daily_case_info_dataset$NEW_TESTS[start_index:length(daily_case_info_dataset$NEW_TESTS)]
-  mod_pos_range <- daily_case_info_dataset$NEW_CASES[start_index:length(daily_case_info_dataset$NEW_CASES)]
+  mod_pos_range <- daily_case_info_dataset$NEW_POS_TESTS[start_index:length(daily_case_info_dataset$NEW_POS_TESTS)]
   
   fdate <- format(mod_date_range, '%Y-%m-%d')
   
   percent_positve <- (mod_pos_range / mod_test_range) * 100
+  percent_positve <- seven_day_average(percent_positve)
   percent_positve <- round(percent_positve, 1)
   percent_positve[which(!is.finite(percent_positve))] <- 0.0
-  percent_positve[which(percent_positve < 0.0)] <- 0.0
+  percent_positve[which(percent_positve < 0.0)] <- 0.0 
   
   export <- list(xval = fdate, 
                  totalTestVal = mod_test_range,
@@ -1179,28 +1260,77 @@ county_map_plotly <- function(l) {
   )
   
   fig <- fig %>% config(
-    displayModeBar = FALSE,
-    staticPlot = TRUE
+    displayModeBar = FALSE
   )
   
   return(fig)
 }
 
-johns_formula <- function() {
-  l <- c()
+daily_cases_plot_spec <- function(ds) {
+  mov_avg <- seven_day_average(ds$COUNTY_CASE_COUNT)
   
-  for(i in 1:length(sum$NEW_CASES)) {
-    if(i <= 21) {
-      l <- c(l, 0)
-    } else {
-      l <- c(l, sum(sum$NEW_CASES[(i-19):i]))
-    }
-  }
+  county <- paste(ds$COUNTY[1], 'County')
+  g_title <- paste('Daily Confirmed COVID-19 Cases in ', county, ", TN", sep = '')
   
-  return(l)
+  fdate <- format(ds$DATE, '%Y-%m-%d')
+  
+  export <- list(xval = fdate, 
+                 yval = ds$COUNTY_CASE_COUNT, 
+                 barcolor = 'rgba(0, 182, 199, 0.5)', 
+                 fillcolor = 'rgba(0, 182, 199, 0.25)', 
+                 movingAverage = mov_avg,
+                 movingLineColor = 'rgb(0, 164, 179)',
+                 gtitle = g_title, 
+                 ytitle = "Daily Confirmed Cases",
+                 type = "daily")
+  
+  return(export)
 }
 
-
+daily_plotly <- function(pObj) {
+  fig <- plot_ly()
+  
+  fig <- fig %>% add_trace(x = pObj[["xval"]],
+                           y = pObj[["yval"]],
+                           type = "bar",
+                           mode = "lines+markers",
+                           marker = list(
+                             color = pObj[["barcolor"]]
+                           ),
+                           hoverinfo = "x+y")
+  fig <- fig %>% add_trace(x = pObj[["xval"]],
+                           y = pObj[["movingAverage"]],
+                           type = "scatter",
+                           mode = "lines",
+                           fill = "tozeroy",
+                           fillcolor = pObj[["fillcolor"]],
+                           line = list(
+                             color = pObj[["movingLineColor"]]
+                           ),
+                           hoverinfo = "skip")
+  
+  fig <- fig %>% layout(
+    xaxis = list(
+      title = "Date"
+    ),
+    yaxis = list(
+      title = pObj[["ytitle"]]
+    ),
+    showlegend = FALSE,
+    margin = list(
+      l = 60,
+      r = 2, 
+      t = 25,
+      pad = 2
+    ),
+    autosize = TRUE,
+    dragmode = 'pan'
+  )
+    
+  fig <- fig %>% config(responsive = FALSE)
+  
+  return(fig)
+}
 
 ######################################
 # Script
@@ -1229,29 +1359,33 @@ age_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/nov
 county_new_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-County-New.XLSX"
 daily_case_info_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Daily-Case-Info.XLSX"
 race_ethnicity_sex_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-RaceEthSex.XLSX"
+specimen_collection_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-MMWR-Week-Case-Count.XLSX"
 
 age_dataset_filename_prefix <- "age_dataset"
 county_new_dataset_filename_prefix <- "county_new_dataset"
 daily_case_info_dataset_filename_prefix <- "daily_case_info_dataset"
-race_ethnicity_sex_dataset_filename_prefix <- "race_ethnicity_sex_dataset_url"
+race_ethnicity_sex_dataset_filename_prefix <- "race_ethnicity_sex_dataset"
+specimen_collection_filename_prefix <- "specimen_collection"
 
 age_temp_path <- temp_path(add_xlsx(age_dataset_filename_prefix))
 county_new_temp_path <- temp_path(add_xlsx(county_new_dataset_filename_prefix))
 daily_case_info_temp_path <- temp_path(add_xlsx(daily_case_info_dataset_filename_prefix))
 race_ethnicity_sex_temp_path <- temp_path(add_xlsx(race_ethnicity_sex_dataset_filename_prefix))
+specimen_collection_temp_path <- temp_path(add_xlsx(specimen_collection_filename_prefix))
 
 print("Downloading files...")
 download.file(url = age_dataset_url, destfile = age_temp_path)
 download.file(url = county_new_dataset_url, destfile = county_new_temp_path)
 download.file(url = daily_case_info_dataset_url, destfile = daily_case_info_temp_path)
 download.file(url = race_ethnicity_sex_dataset_url, destfile = race_ethnicity_sex_temp_path)
+download.file(url = specimen_collection_dataset_url, destfile = specimen_collection_temp_path)
 
 print("Loading files...")
 
 age_col_types <- c("date", "text", "numeric", "numeric", "numeric", 
                    "numeric", "numeric", "numeric")
 
-county_new_col_types <- c("date", "text", "numeric", "numeric", "numeric","numeric", "numeric","numeric",
+county_new_col_types <- c("date", "text", "numeric", "numeric", "numeric", "numeric","numeric", "numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
            "numeric","numeric", "numeric")
@@ -1263,12 +1397,16 @@ daily_case_info_col_types <- c("date", "numeric","numeric", "numeric", "numeric"
 
 race_ethnicity_sex_col_types <- c("text", "date", "text", "numeric", "numeric", "numeric", "numeric")
 
+specimen_collection_col_types <- c("date", "text", "numeric", "numeric", "text")
+
 fips_col_types <- c("character", "character")
 
 age_dataset <- load_file(age_temp_path, age_col_types)
 county_new_dataset <- load_file(county_new_temp_path, county_new_col_types)
 daily_case_info_dataset <- load_file(daily_case_info_temp_path, daily_case_info_col_types)
 race_ethnicity_sex_dataset <- load_file_race(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
+specimen_collection_dataset <- load_file(specimen_collection_temp_path, specimen_collection_col_types)
+
 fips <- read.csv(file = 'fips/tn-counties.csv', stringsAsFactors = FALSE, colClasses = fips_col_types)
 county_geojson <- rjson::fromJSON(file = "geojson/county_geojson.json")
 tn_geojson <- rjson::fromJSON(file = 'geojson/tn_geojson.json')
@@ -1276,11 +1414,8 @@ tn_geojson <- rjson::fromJSON(file = 'geojson/tn_geojson.json')
 datasets <- list(age_dataset,
                  county_new_dataset,
                  daily_case_info_dataset,
-                 race_ethnicity_sex_dataset)
-
-if(!all_same_date(datasets)) {
-  stop("Datasets are not from the same day")
-}
+                 race_ethnicity_sex_dataset,
+                 specimen_collection_dataset)
 
 curr_date <- curr_dataset_date(datasets)
 fcurr_date <- formatted_date(curr_date)
@@ -1310,6 +1445,10 @@ print("Reformatting data...")
 age_superlist <- split_by_date(age_dataset)
 county_new_superlist <- split_by_county(county_new_dataset)
 race_ethnicity_sex_superlist <- split_by_date(race_ethnicity_sex_dataset)
+daily_case_info_dataset <- add_new_positive_tests_state(daily_case_info_dataset)
+
+specimen_collection_superlist <- split_by_county(specimen_collection_dataset)
+specimen_collection_superlist <- rename_specimen_col(specimen_collection_superlist)
 
 if(is.element(curr_date, counties_dir())) {
   msg <- paste("INFO: Cases information by county already exist for", fcurr_date, "in 'counties' folder.")
@@ -1346,7 +1485,8 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
     l_names <- c("total_cases", "total_deaths",
                  "daily_cases", "daily_deaths", "testing", 
                  "active_cases", "daily_active", "total_recoveries", 
-                 "daily_recoveries", "total_hospitalized", "daily_hospitalized")
+                 "daily_recoveries", "total_hospitalized", "daily_hospitalized",
+                 "daily_cases_specimen")
       
     tcp <- total_cases_plot(county)
     tdp <- total_deaths_plot(county)
@@ -1365,7 +1505,9 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
     th <- total_hospitalized_plot(county)
     dh <- daily_hospitalizations_plot(county)
     
-    plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh)
+    dcsp <- daily_cases_specimen_plot(specimen_collection_superlist[[c_name]])
+    
+    plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh, dcsp)
     names(plot_list) <- l_names
     
     c_list <- append(c_list, list(plot_list))
@@ -1387,8 +1529,9 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   drm <- daily_recovered_map(county_new_superlist)
   thm <- total_hospitalizations_map(county_new_superlist)
   dhm <- daily_hospitalizations_map(county_new_superlist)
+  dcsm <- daily_cases_map(specimen_collection_superlist)
    
-  cmap_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm)
+  cmap_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm, dcsm)
   names(cmap_list) <- l_names
    
   json_cmap_list <- toJSON(cmap_list)
@@ -1407,7 +1550,7 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   dhsm <- daily_hospitalizations_state_map()
   
   smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dhsm)
-  names(smap_list) <- l_names
+  names(smap_list) <- l_names[1:11]
   
   json_smap_list <- toJSON(smap_list)
   write(json_smap_list, file = 'smaps.json')
@@ -1425,7 +1568,7 @@ if(!is.element(curr_date, plots_dir()) && is.element(curr_date, maps_dir())) {
   dhsp <- daily_hospitalizations_state_plot()
   
   state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, thsp, dhsp)
-  names(state_plot_list) <- l_names
+  names(state_plot_list) <- l_names[1:11]
   
   json_state_plots <- toJSON(state_plot_list)
   write(json_state_plots, file = 'state.json')

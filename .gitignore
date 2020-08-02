@@ -11,3 +11,6 @@ cmaps.json
 smaps.json
 state.json
 alljson/
+.Rproj.user/
+counties.zip
+TDOH Data.Rproj
