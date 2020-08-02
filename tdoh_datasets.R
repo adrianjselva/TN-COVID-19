@@ -447,9 +447,8 @@ for (county in county_new_superlist) {
   c_name <- county$COUNTY[1]
   c_name_list <- c(c_name_list, c_name)
     
-  l_names <- c("total_cases", "total_deaths",
-               "daily_cases", "daily_deaths", "testing", 
-               "active_cases", "daily_active", "total_recoveries", 
+  l_names <- c("total_cases", "total_deaths", "daily_cases", "daily_deaths", 
+               "testing", "active_cases", "daily_active", "total_recoveries", 
                "daily_recoveries", "total_hospitalized", "daily_hospitalized",
                "daily_cases_specimen")
   
@@ -481,7 +480,7 @@ for (county in county_new_superlist) {
 names(c_list) <- c_name_list
   
 json_list <- toJSON(c_list)
-write(json_list, file = "output/counties.json")
+write(json_list, file = "output/county_plots.json")
 
 tcm <- total_cases_map(county_new_superlist)
 tdm <- total_deaths_map(county_new_superlist)
@@ -500,7 +499,7 @@ cmap_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm, dcsm)
 names(cmap_list) <- l_names
    
 json_cmap_list <- toJSON(cmap_list)
-write(json_cmap_list, file = 'output/cmaps.json')
+write(json_cmap_list, file = 'output/county_maps.json')
   
 tcsm <- total_cases_state_map()
 tdsm <- total_deaths_state_map()
@@ -518,7 +517,7 @@ smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dh
 names(smap_list) <- l_names[1:11]
 
 json_smap_list <- toJSON(smap_list)
-write(json_smap_list, file = 'output/smaps.json')
+write(json_smap_list, file = 'output/state_maps.json')
 
 tcsp <- total_cases_state_plot()
 tdsp <- total_deaths_state_plot()
@@ -536,6 +535,6 @@ state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, th
 names(state_plot_list) <- l_names[1:11]
 
 json_state_plots <- toJSON(state_plot_list)
-write(json_state_plots, file = 'output/state.json')
+write(json_state_plots, file = 'output/state_plots.json')
 
 print("Successfully completed.")
