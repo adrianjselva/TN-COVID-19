@@ -537,4 +537,7 @@ names(state_plot_list) <- l_names[1:11]
 json_state_plots <- toJSON(state_plot_list)
 write(json_state_plots, file = 'output/state_plots.json')
 
+date_json <- toJSON(list(date = format(curr_date, "%B %d, %Y")))
+write(date_json, file = 'output/date.json')
+
 print("Successfully completed.")
