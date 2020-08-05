@@ -8,6 +8,7 @@ library(readxl)
 library(rjson)
 library(plotly)
 library(tools)
+library(tidyr)
 
 ######################################
 # Functions
@@ -229,6 +230,9 @@ add_new_positive_tests_state <- function(ds) {
 rename_specimen_col <- function(sl) {
   nsl <- lapply(sl, function(cty) {
     colnames(cty)[colnames(cty) == "COUNTY_CASE_COUNT"] <- "NEW_CASES"
+    
+    cty <- cty %>% 
+      complete(DATE = seq.Date(min(DATE), max(DATE), by="day"), fill = list(NEW_CASES = 0, COUNTY = cty$COUNTY[1]))
     
     return(cty)
   })
