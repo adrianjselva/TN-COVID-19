@@ -15,7 +15,7 @@ daily_cases_specimen_state_plot <- function(ds) {
                  movingLineColor = 'rgb(0, 164, 179)',
                  gtitle = g_title, 
                  ytitle = "New Cases (Specimen Collection Date)",
-                 type = "daily")
+                 type = "specimen")
   
   return(export)
 }
