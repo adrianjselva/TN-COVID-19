@@ -240,6 +240,13 @@ rename_specimen_col <- function(sl) {
   return(nsl)
 }
 
+create_state_specimen_collection <- function(ds) {
+  nscds <- aggregate(ds["COUNTY_CASE_COUNT"], by=ds["DATE"], sum)
+  colnames(nscds) <- c('DATE', "NEW_CASES")
+  
+  return(nscds)
+}
+
 ######################################
 # Abstract functions
 ######################################
@@ -269,6 +276,7 @@ source("plots/county/total_recovered_county.R")
 ######################################
 
 source("plots/state/new_active_state.R")
+source("plots/state/new_cases_specimen_state.R")
 source("plots/state/new_cases_state.R")
 source("plots/state/new_deaths_state.R")
 source("plots/state/new_hospitalized_state.R")
@@ -303,7 +311,7 @@ source("maps/county/total_recovered_county.R")
 
 source("maps/state/new_active_state.R")
 source("maps/state/new_cases_state.R")
-#source("maps/state/new_cases_specimen_state.R")
+source("maps/state/new_cases_specimen_state.R")
 source("maps/state/new_deaths_state.R")
 source("maps/state/new_hospitalized_state.R")
 source("maps/state/new_recovered_state.R")
@@ -516,9 +524,10 @@ trsm <- total_recovered_state_map()
 drsm <- daily_recovered_state_map()
 thsm <- total_hospitalizations_state_map()
 dhsm <- daily_hospitalizations_state_map()
+dcssm <- daily_cases_specimen_state_map()
   
-smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dhsm)
-names(smap_list) <- l_names[1:11]
+smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dhsm, dcssm)
+names(smap_list) <- l_names
 
 json_smap_list <- toJSON(smap_list)
 write(json_smap_list, file = 'output/state_maps.json')
@@ -534,9 +543,10 @@ trsp <- total_recovered_state_plot()
 drsp <- daily_recovered_state_plot()
 thsp <- total_hospitalizations_state_plot()
 dhsp <- daily_hospitalizations_state_plot()
+dcssp <- daily_cases_specimen_state_plot(specimen_collection_dataset)
   
-state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, thsp, dhsp)
-names(state_plot_list) <- l_names[1:11]
+state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, thsp, dhsp, dcssp)
+names(state_plot_list) <- l_names
 
 json_state_plots <- toJSON(state_plot_list)
 write(json_state_plots, file = 'output/state_plots.json')
