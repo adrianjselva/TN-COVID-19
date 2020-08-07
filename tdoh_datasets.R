@@ -340,34 +340,48 @@ if(!dir.exists("output")) {
 dir.create("temp")
 
 age_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Age.XLSX"
+age_county_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Daily-County-Age-Group.XLSX"
 county_new_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-County-New.XLSX"
 daily_case_info_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Daily-Case-Info.XLSX"
 race_ethnicity_sex_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-RaceEthSex.XLSX"
+county_school_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Daily-County-School.XLSX"
 specimen_collection_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-MMWR-Week-Case-Count.XLSX"
+age_outcomes_dataset_url <- "https://www.tn.gov/content/dam/tn/health/documents/cedep/novel-coronavirus/datasets/Public-Dataset-Daily-Age-Group-Outcomes.XLSX"
 
 age_dataset_filename_prefix <- "age_dataset"
+age_county_dataset_filename_prefix <- "age_county_dataset"
 county_new_dataset_filename_prefix <- "county_new_dataset"
 daily_case_info_dataset_filename_prefix <- "daily_case_info_dataset"
 race_ethnicity_sex_dataset_filename_prefix <- "race_ethnicity_sex_dataset"
+county_school_dataset_filename_prefix <- "county_school_dataset"
 specimen_collection_filename_prefix <- "specimen_collection"
+age_outcomes_filename_prefix <- "age_outcomes"
 
 age_temp_path <- temp_path(add_xlsx(age_dataset_filename_prefix))
+age_county_temp_path <- temp_path(add_xlsx(age_county_dataset_filename_prefix))
 county_new_temp_path <- temp_path(add_xlsx(county_new_dataset_filename_prefix))
 daily_case_info_temp_path <- temp_path(add_xlsx(daily_case_info_dataset_filename_prefix))
 race_ethnicity_sex_temp_path <- temp_path(add_xlsx(race_ethnicity_sex_dataset_filename_prefix))
+county_school_temp_path <- temp_path(add_xlsx(county_school_dataset_filename_prefix))
 specimen_collection_temp_path <- temp_path(add_xlsx(specimen_collection_filename_prefix))
+age_outcomes_temp_path <- temp_path(add_xlsx(age_outcomes_filename_prefix))
 
 print("Downloading files...")
 download.file(url = age_dataset_url, destfile = age_temp_path)
+download.file(url = age_county_dataset_url, destfile = age_county_temp_path)
 download.file(url = county_new_dataset_url, destfile = county_new_temp_path)
 download.file(url = daily_case_info_dataset_url, destfile = daily_case_info_temp_path)
 download.file(url = race_ethnicity_sex_dataset_url, destfile = race_ethnicity_sex_temp_path)
+download.file(url = county_school_dataset_url, destfile = county_school_temp_path)
 download.file(url = specimen_collection_dataset_url, destfile = specimen_collection_temp_path)
+download.file(url = age_outcomes_dataset_url, destfile = age_outcomes_temp_path)
 
 print("Loading files...")
 
 age_col_types <- c("date", "text", "numeric", "numeric", "numeric", 
                    "numeric", "numeric", "numeric")
+
+age_county_col_types <- c("date", "text", "text", "numeric")
 
 county_new_col_types <- c("date", "text", "numeric", "numeric", "numeric", "numeric","numeric", "numeric","numeric",
            "numeric","numeric","numeric","numeric","numeric",
@@ -381,25 +395,35 @@ daily_case_info_col_types <- c("date", "numeric","numeric", "numeric", "numeric"
 
 race_ethnicity_sex_col_types <- c("text", "date", "text", "numeric", "numeric", "numeric", "numeric")
 
+county_school_col_types <- c("date", "text", "numeric", "numeric")
+
 specimen_collection_col_types <- c("date", "text", "numeric", "numeric", "text")
+
+age_outcomes_col_types <- c("date", "text", "numeric", "numeric", "numeric", "numeric", "numeric")
 
 fips_col_types <- c("character", "character")
 
 age_dataset <- load_file(age_temp_path, age_col_types)
+age_county_dataset <- load_file(age_county_temp_path, age_county_col_types)
 county_new_dataset <- load_file(county_new_temp_path, county_new_col_types)
 daily_case_info_dataset <- load_file(daily_case_info_temp_path, daily_case_info_col_types)
 race_ethnicity_sex_dataset <- load_file_race(race_ethnicity_sex_temp_path, race_ethnicity_sex_col_types)
+county_school_dataset <- load_file(county_school_temp_path, county_school_col_types)
 specimen_collection_dataset <- load_file(specimen_collection_temp_path, specimen_collection_col_types)
+age_outcomes_dataset <- load_file(age_outcomes_temp_path, age_outcomes_col_types)
 
 fips <- read.csv(file = 'fips/tn-counties.csv', stringsAsFactors = FALSE, colClasses = fips_col_types)
 county_geojson <- rjson::fromJSON(file = "geojson/county_geojson.json")
 tn_geojson <- rjson::fromJSON(file = 'geojson/tn_geojson.json')
 
 datasets <- list(age_dataset,
+                 age_county_dataset,
                  county_new_dataset,
                  daily_case_info_dataset,
                  race_ethnicity_sex_dataset,
-                 specimen_collection_dataset)
+                 county_school_dataset,
+                 specimen_collection_dataset,
+                 age_outcomes_dataset)
 
 curr_date <- curr_dataset_date(datasets)
 fcurr_date <- formatted_date(curr_date)
