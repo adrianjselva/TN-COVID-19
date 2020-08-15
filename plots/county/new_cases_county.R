@@ -12,8 +12,7 @@ daily_cases_plot <- function(ds) {
                  fillcolor = 'rgba(0, 182, 199, 0.25)', 
                  movingAverage = mov_avg,
                  movingLineColor = 'rgb(0, 164, 179)',
-                 gtitle = g_title, 
-                 ytitle = "New Cases",
+                 gtitle = g_title,
                  type = "daily")
   
   return(export)

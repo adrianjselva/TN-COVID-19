@@ -271,6 +271,8 @@ source("plots/county/total_deaths_county.R")
 source("plots/county/total_hospitalized_county.R")
 source("plots/county/total_recovered_county.R")
 
+source("plots/county/reported_cases_county.R")
+
 ######################################
 # State plots
 ######################################
@@ -487,6 +489,11 @@ for (county in county_new_superlist) {
                "testing", "active_cases", "daily_active", "total_recoveries",
                "daily_recoveries", "total_hospitalized", "daily_hospitalized",
                "daily_cases_specimen")
+  
+  lr_names <- c("total_cases", "total_deaths", "daily_cases", "daily_deaths",
+               "testing", "active_cases", "daily_active", "total_recoveries",
+               "daily_recoveries", "total_hospitalized", "daily_hospitalized",
+               "daily_cases_specimen", "reported_cases")
 
   tcp <- total_cases_plot(county)
   tdp <- total_deaths_plot(county)
@@ -506,9 +513,17 @@ for (county in county_new_superlist) {
   dh <- daily_hospitalizations_plot(county)
 
   dcsp <- daily_cases_specimen_plot(specimen_collection_superlist[[c_name]])
+  
+  specimen_cases_county <- specimen_cases_plot_county(dcsp, tcsp)
+  reported_cases_county <- reported_cases_plot_county(dcp, tcp)
+  reported_deaths_county <- reported_deaths_plot_county(ddp, tdp)
+  reported_active_county <- reported_active_plot_county(cac, dac)
+  reported_recovered_county <- reported_recovered_plot_county(dr, tr)
+  reported_hospitalized_county <- reported_hospitalized_plot_county(dh, th)
+  
 
-  plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh, dcsp)
-  names(plot_list) <- l_names
+  plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh, dcsp, reported_cases_county)
+  names(plot_list) <- lr_names
 
   c_list <- append(c_list, list(plot_list))
 }

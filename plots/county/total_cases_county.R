@@ -8,8 +8,7 @@ total_cases_plot <- function(ds) {
   export <- list(xval = fdate, 
                  yval = ds$TOTAL_CASES, 
                  linecolor = 'rgb(0, 164, 179)', 
-                 gtitle = g_title, 
-                 ytitle = "Confirmed Cases",
+                 gtitle = g_title,
                  type = "total")
   
   return(export)
