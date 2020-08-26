@@ -253,6 +253,8 @@ create_state_specimen_collection <- function(ds) {
 
 source("plots/abstract_plots.R")
 source("maps/abstract_maps.R")
+source("plots/daily_total_plot.R")
+source("plots/total_daily_plot.R")
 
 ######################################
 # County Plots
@@ -490,10 +492,9 @@ for (county in county_new_superlist) {
                "daily_recoveries", "total_hospitalized", "daily_hospitalized",
                "daily_cases_specimen")
   
-  lr_names <- c("total_cases", "total_deaths", "daily_cases", "daily_deaths",
-               "testing", "active_cases", "daily_active", "total_recoveries",
-               "daily_recoveries", "total_hospitalized", "daily_hospitalized",
-               "daily_cases_specimen", "reported_cases")
+  lr_names <- c("active", "cases", "cases_specimen", 
+                "deaths", "hospitalizations", "recovered",
+                "testing")
 
   tcp <- total_cases_plot(county)
   tdp <- total_deaths_plot(county)
@@ -511,18 +512,16 @@ for (county in county_new_superlist) {
 
   th <- total_hospitalized_plot(county)
   dh <- daily_hospitalizations_plot(county)
-
-  dcsp <- daily_cases_specimen_plot(specimen_collection_superlist[[c_name]])
   
-  specimen_cases_county <- specimen_cases_plot_county(dcsp, tcsp)
-  reported_cases_county <- reported_cases_plot_county(dcp, tcp)
-  reported_deaths_county <- reported_deaths_plot_county(ddp, tdp)
-  reported_active_county <- reported_active_plot_county(cac, dac)
-  reported_recovered_county <- reported_recovered_plot_county(dr, tr)
-  reported_hospitalized_county <- reported_hospitalized_plot_county(dh, th)
+  active_plot <- total_daily_plot(cac, dac, "Reporting Date", list())
+  cases_plot <- daily_total_plot(dcp, tcp, "Reporting Date", list())
+  cases_specimen_plot <- daily_cases_specimen_plot(specimen_collection_superlist[[c_name]])
+  deaths_plot <- daily_total_plot(ddp, tdp, "Reporting Date", list())
+  recovered_plot <- daily_total_plot(dr, tr, "Reporting Date", list())
+  hospitalizations_plot <- daily_total_plot(dh, th, "Reporting Date", list())
   
 
-  plot_list <- list(tcp, tdp, dcp, ddp, dtest, cac, dac, tr, dr, th, dh, dcsp, reported_cases_county)
+  plot_list <- list(active_plot, cases_plot, cases_specimen_plot, deaths_plot, hospitalizations_plot, recovered_plot, dtest)
   names(plot_list) <- lr_names
 
   c_list <- append(c_list, list(plot_list))
@@ -546,8 +545,8 @@ thm <- total_hospitalizations_map(county_new_superlist)
 dhm <- daily_hospitalizations_map(county_new_superlist)
 dcsm <- daily_cases_map(specimen_collection_superlist)
 
-cmap_list <- list(tcm, tdm, dcm, ddm, tm, acm, dacm, trm, drm, thm, dhm, dcsm)
-names(cmap_list) <- l_names
+cmap_list <- list(acm, tcm, tcm, tdm, thm, trm, tm)
+names(cmap_list) <- lr_names
 
 json_cmap_list <- toJSON(cmap_list)
 write(json_cmap_list, file = 'output/county_maps.json')
@@ -565,8 +564,8 @@ thsm <- total_hospitalizations_state_map()
 dhsm <- daily_hospitalizations_state_map()
 dcssm <- daily_cases_specimen_state_map()
 
-smap_list <- list(tcsm, tdsm, dcsm, ddsm, tsm, acsm, dacsm, trsm, drsm, thsm, dhsm, dcssm)
-names(smap_list) <- l_names
+smap_list <- list(acsm, tcsm, tcsm, tdsm, thsm, trsm, tsm)
+names(smap_list) <- lr_names
 
 json_smap_list <- toJSON(smap_list)
 write(json_smap_list, file = 'output/state_maps.json')
@@ -582,10 +581,16 @@ trsp <- total_recovered_state_plot()
 drsp <- daily_recovered_state_plot()
 thsp <- total_hospitalizations_state_plot()
 dhsp <- daily_hospitalizations_state_plot()
-dcssp <- daily_cases_specimen_state_plot(specimen_collection_dataset)
 
-state_plot_list <- list(tcsp, tdsp, dcsp, ddsp, tsp, acsp, dacsp, trsp, drsp, thsp, dhsp, dcssp)
-names(state_plot_list) <- l_names
+active_plot <- total_daily_plot(acsp, dacsp, "Reporting Date", list())
+cases_plot <- daily_total_plot(dcsp, tcsp, "Reporting Date", list())
+cases_specimen_plot <- daily_cases_specimen_state_plot(specimen_collection_dataset)
+deaths_plot <- daily_total_plot(ddsp, tdsp, "Reporting Date", list())
+recovered_plot <- daily_total_plot(drsp, trsp, "Reporting Date", list())
+hospitalizations_plot <- daily_total_plot(dhsp, thsp, "Reporting Date", list())
+
+state_plot_list <- list(active_plot, cases_plot, cases_specimen_plot, deaths_plot, hospitalizations_plot, recovered_plot, tsp)
+names(state_plot_list) <- lr_names
 
 json_state_plots <- toJSON(state_plot_list)
 write(json_state_plots, file = 'output/state_plots.json')
